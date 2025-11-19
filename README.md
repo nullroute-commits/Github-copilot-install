@@ -102,6 +102,16 @@ This repository includes automated installation of GitHub Copilot CLI (latest st
 
 ### Quick Install
 
+**Option 1: Using the installation script (recommended)**
+```bash
+# Edit inventory file first
+nano ansible/inventories/proxmox/hosts.yml
+
+# Run the installation script
+./install-copilot-cli.sh
+```
+
+**Option 2: Direct Ansible command**
 ```bash
 # Install on Proxmox 9 node(s)
 ansible-playbook -i ansible/inventories/proxmox/hosts.yml \
