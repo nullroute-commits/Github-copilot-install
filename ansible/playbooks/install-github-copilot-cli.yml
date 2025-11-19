@@ -1,0 +1,179 @@
+---
+- name: Install GitHub Copilot CLI on Proxmox 9 Node
+  hosts: all
+  gather_facts: yes
+  become: yes
+  vars:
+    nodejs_version: "22"
+    npm_version: "10"
+    copilot_cli_package: "@github/copilot"
+    nvm_install_url: "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh"
+
+  pre_tasks:
+    - name: Display installation information
+      debug:
+        msg: |
+          Installing GitHub Copilot CLI (latest stable version)
+          Target: {{ inventory_hostname }}
+          OS: Proxmox 9 (Debian 13 based)
+          Node.js version: {{ nodejs_version }}
+          npm version: {{ npm_version }}
+
+    - name: Verify Proxmox 9 node
+      assert:
+        that:
+          - ansible_distribution == "Debian" or ansible_os_family == "Debian"
+        fail_msg: "This playbook is designed for Proxmox 9 nodes (Debian-based)"
+        success_msg: "Debian-based system detected, proceeding with installation"
+
+  tasks:
+    # Install prerequisites
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required system packages
+      apt:
+        name:
+          - curl
+          - wget
+          - ca-certificates
+          - gnupg
+          - build-essential
+        state: present
+
+    # Install Node.js via NodeSource repository (official method)
+    - name: Download NodeSource setup script for Node.js {{ nodejs_version }}
+      get_url:
+        url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+        dest: /tmp/nodesource_setup.sh
+        mode: '0755'
+
+    - name: Run NodeSource setup script
+      command: bash /tmp/nodesource_setup.sh
+      args:
+        creates: /etc/apt/sources.list.d/nodesource.list
+      register: nodesource_result
+      changed_when: nodesource_result.rc == 0
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
+
+    - name: Verify Node.js installation
+      command: node --version
+      register: node_version
+      changed_when: false
+
+    - name: Display Node.js version
+      debug:
+        msg: "Installed Node.js version: {{ node_version.stdout }}"
+
+    - name: Verify npm version
+      command: npm --version
+      register: npm_version_check
+      changed_when: false
+
+    - name: Display npm version
+      debug:
+        msg: "Current npm version: {{ npm_version_check.stdout }}"
+
+    - name: Upgrade npm to version {{ npm_version }} or higher
+      command: npm install -g npm@{{ npm_version }}
+      when: npm_version_check.stdout is version(npm_version, '<')
+      register: npm_upgrade
+      changed_when: npm_upgrade.rc == 0
+
+    - name: Verify npm upgrade
+      command: npm --version
+      register: npm_final_version
+      changed_when: false
+      when: npm_upgrade is changed
+
+    - name: Display final npm version
+      debug:
+        msg: "Final npm version: {{ npm_final_version.stdout }}"
+      when: npm_upgrade is changed
+
+    # Install GitHub Copilot CLI
+    - name: Install GitHub Copilot CLI globally
+      npm:
+        name: "{{ copilot_cli_package }}"
+        global: yes
+        state: latest
+      register: copilot_install
+
+    - name: Verify GitHub Copilot CLI installation
+      command: copilot --version
+      register: copilot_version
+      changed_when: false
+      failed_when: false
+
+    - name: Display GitHub Copilot CLI version
+      debug:
+        msg: "GitHub Copilot CLI version: {{ copilot_version.stdout }}"
+      when: copilot_version.rc == 0
+
+    - name: Check if Copilot CLI is accessible
+      command: which copilot
+      register: copilot_path
+      changed_when: false
+      failed_when: false
+
+    - name: Display Copilot CLI installation path
+      debug:
+        msg: "GitHub Copilot CLI installed at: {{ copilot_path.stdout }}"
+      when: copilot_path.rc == 0
+
+  post_tasks:
+    - name: Installation summary
+      debug:
+        msg: |
+          ========================================
+          GitHub Copilot CLI Installation Complete
+          ========================================
+          Node.js: {{ node_version.stdout }}
+          npm: {{ npm_final_version.stdout if npm_upgrade is changed else npm_version_check.stdout }}
+          Copilot CLI: {{ copilot_version.stdout if copilot_version.rc == 0 else
+            'Installation may have failed - please check logs' }}
+          ========================================
+
+          Next Steps:
+          1. Run 'copilot' to launch the CLI
+          2. Use '/login' to authenticate with GitHub
+          3. Ensure you have an active GitHub Copilot subscription
+
+          For more information, visit:
+          https://docs.github.com/copilot/how-tos/set-up/install-copilot-cli
+          ========================================
+
+    - name: Create installation verification script
+      copy:
+        content: |
+          #!/bin/bash
+          echo "GitHub Copilot CLI Installation Verification"
+          echo "============================================="
+          echo ""
+          echo "Node.js version:"
+          node --version
+          echo ""
+          echo "npm version:"
+          npm --version
+          echo ""
+          echo "GitHub Copilot CLI version:"
+          copilot --version || echo "Copilot CLI not found in PATH"
+          echo ""
+          echo "Copilot CLI location:"
+          which copilot || echo "Copilot CLI not found in PATH"
+          echo ""
+          echo "To start using Copilot CLI:"
+          echo "  1. Run: copilot"
+          echo "  2. Authenticate with: /login"
+          echo ""
+        dest: /usr/local/bin/verify-copilot-install
+        mode: '0755'
+        owner: root
+        group: root

@@ -9,6 +9,7 @@ A production-grade CI/CD pipeline implementation using Python 3.12, Docker Compo
 - **Multi-environment support** (dev, test, staging, prod) with PATH-scoped configurations
 - **Comprehensive CI/CD** with GitHub Actions, GitLab CI, and Jenkins support
 - **Infrastructure as Code** using Ansible 10.5.0 (latest stable)
+- **GitHub Copilot CLI Installation** for Proxmox 9 nodes (latest stable v0.0.359)
 - **Security-first approach** with automated scanning and policy enforcement
 - **Enterprise-grade monitoring** with Prometheus, Grafana, and distributed tracing
 - **Automated testing** including unit, integration, E2E, and performance tests
@@ -94,6 +95,55 @@ make test
 make test ENVIRONMENT=test
 docker compose -f docker-compose.pipeline.yml run --rm pipeline-executor test
 ```
+
+## 🤖 GitHub Copilot CLI Installation
+
+This repository includes automated installation of GitHub Copilot CLI (latest stable v0.0.359) for Proxmox 9 nodes using Ansible.
+
+### Quick Install
+
+```bash
+# Install on Proxmox 9 node(s)
+ansible-playbook -i ansible/inventories/proxmox/hosts.yml \
+  ansible/playbooks/install-github-copilot-cli.yml
+```
+
+### Prerequisites
+
+- Proxmox VE 9 node with SSH access
+- Active GitHub Copilot subscription (Pro, Pro+, Business, or Enterprise)
+- Internet connectivity on target node
+
+### What Gets Installed
+
+- Node.js 22.x (latest LTS)
+- npm 10.x or higher
+- GitHub Copilot CLI (@github/copilot) - latest stable release
+- Verification script at `/usr/local/bin/verify-copilot-install`
+
+### Verify Installation
+
+SSH into your Proxmox node and run:
+```bash
+verify-copilot-install
+# or
+copilot --version
+```
+
+### Usage
+
+```bash
+# Launch Copilot CLI
+copilot
+
+# Authenticate (first time)
+/login
+
+# Get help
+/help
+```
+
+📖 **Full Documentation**: See [ansible/COPILOT_CLI_INSTALL.md](ansible/COPILOT_CLI_INSTALL.md) for detailed instructions, troubleshooting, and advanced configuration.
 
 ## 🔧 Configuration
 
