@@ -103,7 +103,7 @@
       npm:
         name: "{{ copilot_cli_package }}"
         global: yes
-        state: latest
+        state: present
       register: copilot_install
 
     - name: Verify GitHub Copilot CLI installation
@@ -136,7 +136,7 @@
           GitHub Copilot CLI Installation Complete
           ========================================
           Node.js: {{ node_version.stdout }}
-          npm: {{ npm_final_version.stdout if npm_upgrade is changed else npm_version_check.stdout }}
+          npm: {{ npm_final_version.stdout if (npm_upgrade is defined and npm_upgrade is changed) else npm_version_check.stdout }}
           Copilot CLI: {{ copilot_version.stdout if copilot_version.rc == 0 else
             'Installation may have failed - please check logs' }}
           ========================================
