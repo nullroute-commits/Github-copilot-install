@@ -4,7 +4,7 @@
 This repository has been updated to support automated installation of the latest stable release of GitHub Copilot CLI on Proxmox 9 nodes.
 
 ## Latest Stable Version
-**GitHub Copilot CLI v0.0.359** (Released: November 17, 2025)
+**GitHub Copilot CLI (latest stable)**
 
 ## What Was Added
 
@@ -147,7 +147,7 @@ copilot
 ### Documentation
 - **Main Guide**: `ansible/COPILOT_CLI_INSTALL.md`
 - **GitHub Docs**: https://docs.github.com/copilot/how-tos/set-up/install-copilot-cli
-- **Proxmox Docs**: https://pve.proxmox.com/pve-docs-9-beta/
+- **Proxmox Docs**: https://pve.proxmox.com/pve-docs-9/
 
 ### Common Issues
 Comprehensive troubleshooting guide included in `ansible/COPILOT_CLI_INSTALL.md`:
@@ -235,4 +235,4 @@ The repository now provides a complete, production-ready solution for installing
 
 ---
 
-**Note**: This implementation is specifically optimized for Proxmox VE 9 (Debian 13 based) and installs the latest stable GitHub Copilot CLI release (v0.0.359) as of November 2025.
+**Note**: This implementation is specifically optimized for Proxmox VE 9 (Debian 13 based) and installs the latest stable GitHub Copilot CLI release.

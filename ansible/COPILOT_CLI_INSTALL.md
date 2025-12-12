@@ -8,7 +8,7 @@ GitHub Copilot CLI brings AI-powered assistance directly to your command line. T
 
 ### Latest Stable Version
 
-**Current Release:** v0.0.359 (as of November 2025)
+**Current Release:** Latest stable (installed by default)
 
 ## Prerequisites
 
@@ -325,7 +325,7 @@ To install on multiple Proxmox nodes simultaneously:
 ### Documentation
 
 - **GitHub Copilot CLI**: https://docs.github.com/copilot/how-tos/set-up/install-copilot-cli
-- **Proxmox VE 9**: https://pve.proxmox.com/pve-docs-9-beta/
+- **Proxmox VE 9**: https://pve.proxmox.com/pve-docs-9/
 - **Ansible**: https://docs.ansible.com/
 
 ### Issues
@@ -342,12 +342,12 @@ This project follows the repository's main license. GitHub Copilot CLI usage is 
 
 ## Changelog
 
-### Version 1.0.0 (November 2025)
+### Version 1.0.0 (December 2025)
 - Initial release
 - Support for Proxmox VE 9 (Debian 13 based)
 - Installs Node.js 22.x
 - Installs npm 10.x
-- Installs GitHub Copilot CLI v0.0.359 (latest stable)
+- Installs GitHub Copilot CLI (latest stable)
 - Includes verification script
 - Multi-node support via Ansible
 
