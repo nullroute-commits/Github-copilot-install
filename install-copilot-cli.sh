@@ -99,7 +99,7 @@ if [ "$1" == "-v" ] || [ "$1" == "--verbose" ]; then
     print_info "Running in verbose mode"
 fi
 
-if ansible-playbook -i "$INVENTORY_FILE" "$PLAYBOOK" $VERBOSE; then
+if ansible-playbook -i "$INVENTORY_FILE" "$PLAYBOOK" "$VERBOSE"; then
     echo ""
     echo "=========================================="
     print_info "Installation completed successfully!"

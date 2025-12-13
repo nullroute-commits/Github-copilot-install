@@ -100,7 +100,7 @@ copilot --version  # Verify new version
 
 - **Node.js**: 22.x (LTS)
 - **npm**: 10.x or higher
-- **Copilot CLI**: v0.0.359 (latest stable)
+- **Copilot CLI**: latest stable
 
 ## Quick Links
 

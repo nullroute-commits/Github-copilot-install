@@ -9,7 +9,7 @@ A production-grade CI/CD pipeline implementation using Python 3.12, Docker Compo
 - **Multi-environment support** (dev, test, staging, prod) with PATH-scoped configurations
 - **Comprehensive CI/CD** with GitHub Actions, GitLab CI, and Jenkins support
 - **Infrastructure as Code** using Ansible 10.5.0 (latest stable)
-- **GitHub Copilot CLI Installation** for Proxmox 9 nodes (latest stable v0.0.359)
+- **GitHub Copilot CLI Installation** for Proxmox 9 nodes (latest stable)
 - **Security-first approach** with automated scanning and policy enforcement
 - **Enterprise-grade monitoring** with Prometheus, Grafana, and distributed tracing
 - **Automated testing** including unit, integration, E2E, and performance tests
@@ -98,7 +98,7 @@ docker compose -f docker-compose.pipeline.yml run --rm pipeline-executor test
 
 ## 🤖 GitHub Copilot CLI Installation
 
-This repository includes automated installation of GitHub Copilot CLI (latest stable v0.0.359) for Proxmox 9 nodes using Ansible.
+This repository includes automated installation of GitHub Copilot CLI (latest stable) for Proxmox 9 nodes using Ansible.
 
 ### Quick Install
 

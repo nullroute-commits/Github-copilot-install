@@ -7,7 +7,6 @@
     nodejs_version: "22"
     npm_version: "10"
     copilot_cli_package: "@github/copilot"
-    nvm_install_url: "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh"
 
   pre_tasks:
     - name: Display installation information
@@ -82,7 +81,7 @@
         msg: "Current npm version: {{ npm_version_check.stdout }}"
 
     - name: Upgrade npm to version {{ npm_version }} or higher
-      command: npm install -g npm@{{ npm_version }}
+      command: npm install -g npm@{{ npm_version }}.x
       when: npm_version_check.stdout is version(npm_version, '<')
       register: npm_upgrade
       changed_when: npm_upgrade.rc == 0
@@ -138,7 +137,7 @@
           Node.js: {{ node_version.stdout }}
           npm: {{ npm_final_version.stdout if (npm_upgrade is defined and npm_upgrade is changed) else npm_version_check.stdout }}
           Copilot CLI: {{ copilot_version.stdout if copilot_version.rc == 0 else
-            'Installation may have failed - please check logs' }}
+            "Installation may have failed. Please run '/usr/local/bin/verify-copilot-install' for troubleshooting steps." }}
           ========================================
 
           Next Steps:
