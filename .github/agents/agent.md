@@ -18,12 +18,12 @@ The project supports two deployment configurations:
 |-----------|-----------|---------|
 | Language | Python | 3.12.5 |
 | Framework | Django | 5.0.2 |
-| Database | PostgreSQL | 17.2 |
+| Database | PostgreSQL | 17.x |
 | ORM | SQLAlchemy | 1.4.49 |
 | Cache | Memcached (python-memcached) | 1.59 |
 | Message Queue | RabbitMQ (Pika) | 1.3.2 |
 | Container Runtime | Docker Compose | v2.29+ |
-| Infrastructure | Ansible | 10.5.0 |
+| Infrastructure | Ansible | 9.9.0 |
 
 **FastAPI Configuration** (`pyproject.toml`):
 
@@ -40,15 +40,18 @@ The project supports two deployment configurations:
 
 ### Multi-Tier Architecture
 
+**Base Infrastructure** (docker-compose.base.yml):
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Presentation Layer: Nginx Load Balancer + Django Web Interface │
+│  Presentation Layer: Nginx Load Balancer                        │
 ├─────────────────────────────────────────────────────────────────┤
-│  Application Layer: Django Business Logic + RBAC + Audit System │
+│  Application Layer: Django/FastAPI + RBAC + Audit System        │
 ├─────────────────────────────────────────────────────────────────┤
-│  Data Layer: PostgreSQL + Memcached + RabbitMQ                  │
+│  Data Layer: PostgreSQL + Redis                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+> **Note:** The Django stack (`requirements/`) additionally supports Memcached and RabbitMQ. The FastAPI stack (`pyproject.toml`) uses Redis for caching.
 
 ---
 
@@ -73,8 +76,8 @@ The project supports two deployment configurations:
 ├── environments/           # Environment-specific configs
 ├── ansible/                # Infrastructure as Code
 │   ├── playbooks/         # Deployment playbooks
-│   ├── inventories/       # Environment inventories
-│   └── roles/             # Reusable roles
+│   ├── inventories/       # Environment inventories (dev, test, prod)
+│   └── templates/         # Ansible templates
 ├── ci/                     # CI/CD configurations and scripts
 └── config/                 # Django configuration
     └── settings/          # Environment-specific settings
@@ -166,7 +169,6 @@ audit_logger.log_activity(
 
 - `development` - Debug enabled, hot-reload
 - `testing` - Isolated databases, fast I/O
-- `staging` - Production-like, approval gates
 - `production` - Fully optimized, secure
 
 ---
@@ -323,7 +325,7 @@ sensitive_fields = {
 | Environment | Branch Trigger | Approval |
 |-------------|----------------|----------|
 | Development | `develop` | Auto |
-| Staging | `main` | Auto |
+| Test | `main` | Auto |
 | Production | `release/*` | Manual |
 
 ### Blue-Green Deployment
@@ -427,10 +429,10 @@ audit_logger.log_activity(
 
 ```bash
 # Check PostgreSQL is running
-docker compose ps db
+docker compose ps postgres
 
 # Check connection
-docker compose exec db psql -U postgres -d django_app -c "SELECT 1"
+docker compose exec postgres psql -U postgres -d django_app -c "SELECT 1"
 ```
 
 ### Cache Issues
@@ -476,12 +478,11 @@ make dev-up          # Start dev environment
 make dev-down        # Stop dev environment
 make test            # Run all tests
 make lint            # Run linters
-make format          # Format code
 
 # Docker
 docker compose build # Rebuild containers
 docker compose logs  # View logs
-docker compose exec web bash  # Shell into container
+docker compose -f docker-compose.base.yml -f docker-compose.dev.yml exec app bash  # Shell into app container
 
 # Database (Django Stack)
 python manage.py migrate        # Run migrations
@@ -492,7 +493,7 @@ alembic upgrade head           # Run migrations
 alembic revision --autogenerate -m "Description"  # Create migrations
 
 # Deploy
-make deploy ENVIRONMENT=staging
+make deploy ENVIRONMENT=prod
 ansible-playbook -i ansible/inventories/prod/hosts.yml ansible/playbooks/deploy.yml
 ```
 
